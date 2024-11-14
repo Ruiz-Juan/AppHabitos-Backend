@@ -6,7 +6,8 @@ import { HabitContext } from '../context/HabitContext';
 import axios from 'axios';
 import { auth } from '../services/firebase'; // Importamos auth para obtener el usuario autenticado
 
-const SERVER_URL = 'http://192.168.15.178:3000'; // Cambiado a tu IP local
+//const SERVER_URL = 'http://192.168.15.178:3000'; 
+const SERVER_URL = 'http://10.10.11.242:3000'; 
 
 export default function ReminderScreen({ navigation }) {
   const { habitData } = useContext(HabitContext);

@@ -80,7 +80,6 @@ export default function FrequencyScreen({ navigation }) {
         <Button title="Siguiente" onPress={handleNext} disabled={!selectedFrequency} />
       </View>
 
-      {/* Modal for specific days of the week */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -104,7 +103,6 @@ export default function FrequencyScreen({ navigation }) {
         </View>
       </Modal>
 
-      {/* Modal for specific days of the month */}
       <Modal
         animationType="slide"
         transparent={true}

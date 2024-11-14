@@ -33,3 +33,11 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Ignorar el archivo de configuración de Firebase
+google-services.json
+
+# Ignorar claves de servicio
+.env
+habit-notification-server/serviceAccountKey.json
+

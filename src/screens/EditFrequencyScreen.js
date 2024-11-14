@@ -75,7 +75,6 @@ export default function EditFrequencyScreen({ navigation }) {
         <Button title="Guardar Frecuencia" onPress={handleSave} disabled={!selectedFrequency} />
       </View>
 
-      {/* Modal para seleccionar días específicos de la semana */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -99,7 +98,6 @@ export default function EditFrequencyScreen({ navigation }) {
         </View>
       </Modal>
 
-      {/* Modal para seleccionar días específicos del mes */}
       <Modal
         animationType="slide"
         transparent={true}
