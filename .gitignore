@@ -40,4 +40,3 @@ google-services.json
 # Ignorar claves de servicio
 .env
 habit-notification-server/serviceAccountKey.json
-

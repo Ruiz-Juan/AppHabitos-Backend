@@ -2,18 +2,24 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { 
+  FIREBASE_API_KEY,
+  FIREBASE_AUTH_DOMAIN,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET,
+  FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_APP_ID 
+} from '@env';
 
-// Configuración de Firebase obtenida de google-services.json
 const firebaseConfig = {
-  apiKey: "AIzaSyDdSV3Swsk_486cai15qTOmZBzqXj-8yuc",
-  authDomain: "apphabitos-b24ef.firebaseapp.com",
-  projectId: "apphabitos-b24ef",
-  storageBucket: "apphabitos-b24ef.appspot.com",
-  messagingSenderId: "941298597520",
-  appId: "1:941298597520:android:a1d1fa40a5e8f55ef36215"
+  apiKey: FIREBASE_API_KEY,
+  authDomain: FIREBASE_AUTH_DOMAIN,
+  projectId: FIREBASE_PROJECT_ID,
+  storageBucket: FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+  appId: FIREBASE_APP_ID
 };
 
-// Inicializar Firebase solo si no ha sido inicializado previamente
 let app;
 if (!initializeApp.apps || !initializeApp.apps.length) {
   app = initializeApp(firebaseConfig);
@@ -21,7 +27,6 @@ if (!initializeApp.apps || !initializeApp.apps.length) {
   app = initializeApp.apps[0];
 }
 
-// Inicializar autenticación con persistencia
 export const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(AsyncStorage),
 });
