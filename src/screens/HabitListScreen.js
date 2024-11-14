@@ -1,29 +1,46 @@
 // Archivo: src/screens/HabitListScreen.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function HabitListScreen({ navigation }) {
-  const habits = [
-    { id: '1', name: 'Ejercicio Diario', streak: '3 días consecutivos' },
-    { id: '2', name: 'Leer un Capítulo', streak: '3 días consecutivos' },
-    { id: '3', name: 'Meditación', streak: '3 días consecutivos' },
-  ];
+  const [habits, setHabits] = useState([]);
+
+  useEffect(() => {
+    const loadHabits = async () => {
+      try {
+        const storedHabits = await AsyncStorage.getItem('@habits');
+        const parsedHabits = storedHabits ? JSON.parse(storedHabits) : [];
+
+        const validHabits = parsedHabits.filter(habit => habit.habitName && habit.habitName.trim() !== "");
+        setHabits(validHabits);
+        console.log('Hábitos cargados:', validHabits);
+      } catch (e) {
+        console.error('Error al cargar los hábitos:', e);
+      }
+    };
+
+    loadHabits();
+    const unsubscribe = navigation.addListener('focus', loadHabits);
+    return unsubscribe;
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Mis Hábitos</Text>
       <FlatList
         data={habits}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.habitContainer}>
-            <Text style={styles.habitName}>{item.name}</Text>
-            <Text style={styles.habitStreak}>{item.streak}</Text>
-            <TouchableOpacity style={styles.checkButton}>
-              <Text style={styles.checkButtonText}>✔</Text>
-            </TouchableOpacity>
-          </View>
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => (
+          <TouchableOpacity
+            style={styles.habitContainer}
+            onPress={() => navigation.navigate('Editar Hábito', { habit: item, index })}
+          >
+            <Text style={styles.habitName}>{item.habitName}</Text>
+            <Text style={styles.habitStreak}>{item.description}</Text>
+          </TouchableOpacity>
         )}
+        ListEmptyComponent={<Text style={styles.emptyText}>No tienes hábitos registrados aún.</Text>}
       />
       <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('Registrar Hábito')}>
         <Text style={styles.addButtonText}>+</Text>
@@ -60,13 +77,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'gray',
   },
-  checkButton: {
-    backgroundColor: '#d3d3d3',
-    padding: 8,
-    borderRadius: 8,
-  },
-  checkButtonText: {
-    fontSize: 18,
+  emptyText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: 'gray',
+    marginTop: 20,
   },
   addButton: {
     position: 'absolute',

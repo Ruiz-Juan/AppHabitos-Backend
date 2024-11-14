@@ -1,20 +1,43 @@
-// Archivo principal: App.js
-import React from 'react';
-import { Platform } from 'react-native';
+// Archivo: App.js
+import React, { useEffect } from 'react';
+import { Alert, Platform } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
-import { LogBox } from 'react-native';
-
-// Ignorar ciertos warnings innecesarios
-LogBox.ignoreLogs(['Setting a timer']);
-
-// Importar configuraciones específicas para Android
-import { requestNotificationPermission } from './src/services/permissions';
+import { requestFCMPermissionAndToken, saveTokenToFirestore } from './src/services/firebaseMessaging';
+import { auth } from './src/services/firebase';
 
 export default function App() {
-  // Si la plataforma es Android, solicitar permisos para notificaciones
-  if (Platform.OS === 'android') {
-    requestNotificationPermission();
-  }
+  useEffect(() => {
+    async function getFCMToken() {
+      const user = auth.currentUser;
 
-  return <AppNavigator />;
+      if (user) {
+        const userId = user.uid;
+        try {
+          const token = await requestFCMPermissionAndToken();
+          if (token) {
+            console.log('Token de FCM obtenido:', token);
+            await saveTokenToFirestore(userId, token);
+          } else {
+            Alert.alert('Permisos requeridos', 'Se necesitan permisos para enviar notificaciones.');
+          }
+        } catch (error) {
+          console.error('Error al obtener el token de FCM:', error);
+          Alert.alert('Error', 'Hubo un problema al obtener el token de notificación.');
+        }
+      } else {
+        console.log('Usuario no autenticado');
+      }
+    }
+
+    if (Platform.OS !== 'web') {
+      getFCMToken();
+    }
+  }, []);
+
+  return (
+    <NavigationContainer>
+      <AppNavigator />
+    </NavigationContainer>
+  );
 }

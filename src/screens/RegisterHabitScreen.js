@@ -1,24 +1,34 @@
 // Archivo: src/screens/RegisterHabitScreen.js
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { scheduleHabitReminder } from '../services/notifications';
+import { HabitContext } from '../context/HabitContext';
 
 export default function RegisterHabitScreen({ navigation }) {
-  const [habitName, setHabitName] = useState('');
-  const [description, setDescription] = useState('');
-  const [reminderTime, setReminderTime] = useState({ hour: 8, minute: 0 }); // Hora predeterminada
+  const { habitData, setHabitData } = useContext(HabitContext);
+  const [habitName, setHabitName] = useState(habitData.habitName || '');
+  const [description, setDescription] = useState(habitData.description || '');
 
-  const handleAddHabit = async () => {
-    const newHabit = { habitName, description, reminderTime };
-    try {
-      await AsyncStorage.setItem(`@habit_${habitName}`, JSON.stringify(newHabit));
-      console.log('Hábito almacenado localmente:', newHabit);
-      scheduleHabitReminder(habitName, reminderTime);
-      navigation.navigate('Frecuencia');
-    } catch (e) {
-      console.error('Error al almacenar el hábito:', e);
+  useEffect(() => {
+    return () => {
+      setHabitData({
+        habitName: '',
+        description: '',
+        reminderTime: null,
+        frequency: '',
+        selectedDays: [],
+        selectedDates: [],
+      });
+    };
+  }, []);
+
+  const handleNext = () => {
+    if (!habitName.trim()) {
+      alert('Por favor, ingresa un nombre válido para el hábito.');
+      return;
     }
+
+    setHabitData({ ...habitData, habitName: habitName.trim(), description: description.trim() });
+    navigation.navigate('Frecuencia');
   };
 
   return (
@@ -26,7 +36,7 @@ export default function RegisterHabitScreen({ navigation }) {
       <Text style={styles.title}>Agregar Hábito</Text>
       <TextInput
         placeholder="Nombre del Hábito"
-        style={[styles.input, { marginBottom: 24 }]} // Espaciado adicional entre título e inputs
+        style={[styles.input, { marginBottom: 24 }]}
         value={habitName}
         onChangeText={(text) => setHabitName(text)}
       />
@@ -38,7 +48,7 @@ export default function RegisterHabitScreen({ navigation }) {
       />
       <View style={styles.buttonContainer}>
         <Button title="Cancelar" onPress={() => navigation.goBack()} />
-        <Button title="Siguiente" onPress={handleAddHabit} />
+        <Button title="Siguiente" onPress={handleNext} />
       </View>
     </View>
   );

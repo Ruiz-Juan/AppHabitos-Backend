@@ -18,10 +18,32 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.juanruiz.apphabitos",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "6389c83c-1b3c-438d-8c27-4017efb08341"
+      }
+    },
+    "newArchEnabled": true,
+    "plugins": [
+      [
+        "@react-native-firebase/app",
+        {
+          "androidGoogleServicesFile": "./google-services.json"
+        }
+      ],
+      [
+        "@react-native-firebase/messaging",
+        {
+          "androidGoogleServicesFile": "./google-services.json"
+        }
+      ]
+    ]
   }
 }

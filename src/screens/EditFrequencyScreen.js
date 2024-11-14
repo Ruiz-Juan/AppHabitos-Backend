@@ -1,9 +1,9 @@
-// Archivo: src/screens/FrequencyScreen.js
-import React, { useContext, useState, useEffect } from 'react';
+// Archivo: src/screens/EditFrequencyScreen.js
+import React, { useState, useContext, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, TouchableOpacity, Modal } from 'react-native';
 import { HabitContext } from '../context/HabitContext';
 
-export default function FrequencyScreen({ navigation }) {
+export default function EditFrequencyScreen({ navigation }) {
   const { habitData, setHabitData } = useContext(HabitContext);
   const [selectedFrequency, setSelectedFrequency] = useState(habitData.frequency || '');
   const [selectedDays, setSelectedDays] = useState(habitData.selectedDays || []);
@@ -17,29 +17,25 @@ export default function FrequencyScreen({ navigation }) {
     setSelectedDates(habitData.selectedDates || []);
   }, [habitData]);
 
-  const handleNext = () => {
-    if (
-      (selectedFrequency === 'Días específicos de la semana' && selectedDays.length === 0) ||
-      (selectedFrequency === 'Días específicos del mes' && selectedDates.length === 0)
-    ) {
-      alert('Selecciona al menos un día para la frecuencia especificada.');
-      return;
-    }
-
+  const handleSave = () => {
     setHabitData({
       ...habitData,
       frequency: selectedFrequency,
-      selectedDays: selectedDays,
-      selectedDates: selectedDates,
+      selectedDays: selectedFrequency === 'Días específicos de la semana' ? selectedDays : [],
+      selectedDates: selectedFrequency === 'Días específicos del mes' ? selectedDates : [],
     });
-    navigation.navigate('Recordatorio');
+    navigation.goBack();
   };
 
   const handleFrequencySelection = (option) => {
     setSelectedFrequency(option);
+
+    // Limpiar selección de días de la semana y días del mes si se selecciona otra opción
     if (option === 'Todos los días') {
       setSelectedDays([]);
       setSelectedDates([]);
+      setIsModalVisible(false);
+      setIsMonthModalVisible(false);
     } else if (option === 'Días específicos de la semana') {
       setSelectedDates([]);
       setIsModalVisible(true);
@@ -63,7 +59,7 @@ export default function FrequencyScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>¿Con qué frecuencia quieres realizarlo?</Text>
+      <Text style={styles.title}>Editar Frecuencia</Text>
       <View style={styles.optionsContainer}>
         {['Todos los días', 'Días específicos de la semana', 'Días específicos del mes'].map((option, index) => (
           <TouchableOpacity
@@ -76,11 +72,10 @@ export default function FrequencyScreen({ navigation }) {
         ))}
       </View>
       <View style={styles.buttonContainer}>
-        <Button title="Anterior" onPress={() => navigation.navigate('Mis Hábitos')} />
-        <Button title="Siguiente" onPress={handleNext} disabled={!selectedFrequency} />
+        <Button title="Guardar Frecuencia" onPress={handleSave} disabled={!selectedFrequency} />
       </View>
 
-      {/* Modal for specific days of the week */}
+      {/* Modal para seleccionar días específicos de la semana */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -104,7 +99,7 @@ export default function FrequencyScreen({ navigation }) {
         </View>
       </Modal>
 
-      {/* Modal for specific days of the month */}
+      {/* Modal para seleccionar días específicos del mes */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -164,12 +159,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    position: 'absolute',
-    bottom: 32,
-    left: 16,
-    right: 16,
+    marginTop: 20,
   },
   modalContainer: {
     flex: 1,
