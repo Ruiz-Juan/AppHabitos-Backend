@@ -1,13 +1,14 @@
 // Archivo: fcm-backend/server.js
+require('dotenv').config(); // Cargar variables de entorno
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const schedule = require('node-schedule');
 const admin = require('firebase-admin');
-const cors = require('cors'); // Agregar CORS
+const cors = require('cors');
 
-// Inicializar Firebase Admin con la cuenta de servicio
-const serviceAccount = require('./serviceAccountKey.json');
+// Inicializar Firebase Admin con la cuenta de servicio desde variables de entorno
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -19,8 +20,8 @@ const app = express();
 app.use(cors()); // Habilitar CORS
 app.use(bodyParser.json());
 
-// Clave del servidor de FCM
-const FCM_SERVER_KEY = 'AIzaSyDdSV3Swsk_486cai15qTOmZBzqXj-8yuc';
+// Clave del servidor de FCM desde variable de entorno
+const FCM_SERVER_KEY = process.env.FCM_SERVER_KEY;
 
 // Ruta para registrar el token FCM en Firestore
 app.post('/register', async (req, res) => {
@@ -100,7 +101,7 @@ const sendNotification = async (token, habitName, message) => {
   }
 };
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; // Usar el puerto de Railway o 3000 por defecto
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });
