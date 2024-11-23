@@ -115,7 +115,7 @@ const sendNotification = async (token, habitName, message) => {
 
     // Headers para la solicitud
     const headers = {
-      Authorization: `Bearer ${process.env.FCM_SERVER_KEY}`,
+      Authorization: `key=${process.env.FIREBASE_API_KEY}`,
       'Content-Type': 'application/json',
     };
 
@@ -139,3 +139,4 @@ const PORT = process.env.PORT || 3000; // Usar el puerto de Railway o 3000 por d
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });
+
