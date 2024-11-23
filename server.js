@@ -1,5 +1,5 @@
 // Archivo: server.js
-require('dotenv').config(); // Cargar variables de entorno
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
@@ -7,12 +7,12 @@ const schedule = require('node-schedule');
 const admin = require('firebase-admin');
 const cors = require('cors');
 
-// Inicializar Firebase Admin con la cuenta de servicio desde variables de entorno
+// Configurar Firebase Admin con las variables de entorno
 const serviceAccount = {
   type: "service_account",
   project_id: process.env.FIREBASE_PROJECT_ID,
   private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-  private_key: process.env.FIREBASE_PRIVATE_KEY,
+  private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
   client_email: process.env.FIREBASE_CLIENT_EMAIL,
   client_id: process.env.FIREBASE_CLIENT_ID,
   auth_uri: process.env.FIREBASE_AUTH_URI,
@@ -25,16 +25,15 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-const db = admin.firestore(); // Instancia de Firestore
+const db = admin.firestore();
 
 const app = express();
-app.use(cors()); // Habilitar CORS
+app.use(cors());
 app.use(bodyParser.json());
 
-// Clave del servidor de FCM desde variable de entorno
 const FCM_SERVER_KEY = process.env.FCM_SERVER_KEY;
 
-// Ruta para registrar el token FCM en Firestore
+// Registrar token FCM
 app.post('/register', async (req, res) => {
   const { userId, token } = req.body;
   if (!userId || !token) {
@@ -51,7 +50,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Ruta para programar una notificación
+// Programar notificación
 app.post('/schedule-notification', async (req, res) => {
   const { userId, habitName, message, scheduledTime } = req.body;
 
@@ -67,7 +66,7 @@ app.post('/schedule-notification', async (req, res) => {
       userId,
       habitName,
       message,
-      scheduledTime: date,
+      scheduledTime: date.toISOString(),
     });
 
     schedule.scheduleJob(date, async () => {
@@ -87,7 +86,7 @@ app.post('/schedule-notification', async (req, res) => {
   }
 });
 
-// Función para enviar una notificación
+// Enviar notificación
 const sendNotification = async (token, habitName, message) => {
   try {
     await axios.post(
@@ -113,8 +112,7 @@ const sendNotification = async (token, habitName, message) => {
   }
 };
 
-const PORT = process.env.PORT || 3000; // Usar el puerto de Railway o 3000 por defecto
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor ejecutándose en el puerto ${PORT}`);
 });
-
